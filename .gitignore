@@ -1,0 +1,18 @@
+# maven
+target/
+
+# IDEA IntelliJ
+*.iml
+.idea/
+*.ipr
+*.iws
+.idea_modules/
+
+
+# Eclipse
+.settings/
+.classpath
+.project
+.metadata
+*.tmp
+*.bak
