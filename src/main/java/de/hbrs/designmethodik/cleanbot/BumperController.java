@@ -11,12 +11,17 @@ public class BumperController extends Thread {
 
     @Override
     public void run() {
-        while (!interrupted()) {
-            Utils.sleep(100);
+        while (!isInterrupted()) {
+            try {
+                sleep(100);
+            } catch (InterruptedException e) {
+                break;
+            }
             if (!BUMPER.isPressed() && listener != null) {
                 listener.handleBumperCollision();
             }
         }
+        System.out.println("BC exiting...");
     }
 
     public void setListener(final BumperCollisionListener listener) {

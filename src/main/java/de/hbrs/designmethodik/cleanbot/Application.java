@@ -3,9 +3,6 @@ package de.hbrs.designmethodik.cleanbot;
 import lejos.nxt.*;
 import lejos.robotics.navigation.DifferentialPilot;
 
-import static de.hbrs.designmethodik.cleanbot.DrivingController.DriveDirection.BACKWARD;
-import static de.hbrs.designmethodik.cleanbot.DrivingController.DriveDirection.FORWARD;
-
 public class Application {
 
     public static void main(String[] args) {
@@ -24,23 +21,31 @@ public class Application {
 
     private final DrivingController drivingController = new DrivingController(differentialPilot);
 
-    public Application() {
+    private final UltrasonicController ultrasonicController;
+    private final BumperController bumperController;
+    private final DrivingAI drivingAI;
 
+
+    public Application() {
+        ultrasonicController = new UltrasonicController();
+        bumperController = new BumperController();
+        bumperController.setListener(drivingController);
+        drivingAI = new DrivingAI(drivingController);
     }
 
     private void run() {
-
-        UltrasonicController ultrasonicController = new UltrasonicController();
-        BumperController tBumperController = new BumperController();
-        tBumperController.setListener(drivingController);
-        tBumperController.start();
         ultrasonicController.run(drivingController);
+        bumperController.start();
+        drivingAI.start();
 
-        drivingController.driveStraight(FORWARD, 2000);
-        drivingController.driveStraight(BACKWARD, 2000);
         Button.waitForAnyPress();
+        stop();
+    }
+
+    private void stop() {
         System.out.println("terminated.");
-        tBumperController.interrupt();
-        drivingController.stop();
+        bumperController.interrupt();
+        drivingAI.interrupt();
+        differentialPilot.stop();
     }
 }
