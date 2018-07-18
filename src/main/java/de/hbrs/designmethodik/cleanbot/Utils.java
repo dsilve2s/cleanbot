@@ -15,7 +15,7 @@ public class Utils {
     }
 
     public static <T extends Enum> T randomEnum(final T[] values) {
-        return values[RANDOM.nextInt(values.length)];
+        return values[(int)(RANDOM.nextFloat() * values.length)];
     }
 
     public static <T> T requireNonNull(final T t) {

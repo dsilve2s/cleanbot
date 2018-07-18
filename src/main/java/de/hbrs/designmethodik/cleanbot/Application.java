@@ -3,6 +3,8 @@ package de.hbrs.designmethodik.cleanbot;
 import lejos.nxt.*;
 import lejos.robotics.navigation.DifferentialPilot;
 
+import static de.hbrs.designmethodik.cleanbot.Utils.sleep;
+
 public class Application {
 
     public static void main(String[] args) {
@@ -24,6 +26,7 @@ public class Application {
     private final UltrasonicController ultrasonicController;
     private final BumperController bumperController;
     private final DrivingAI drivingAI;
+    private final ContinuousSensorCheck continuousSensorCheck;
 
 
     public Application() {
@@ -31,21 +34,29 @@ public class Application {
         bumperController = new BumperController();
         bumperController.setListener(drivingController);
         drivingAI = new DrivingAI(drivingController);
+        continuousSensorCheck = new ContinuousSensorCheck();
     }
 
     private void run() {
+        InitialSensorCheck.checkSensors();
+
         ultrasonicController.run(drivingController);
         bumperController.start();
         drivingAI.start();
+        continuousSensorCheck.start();
 
         Button.waitForAnyPress();
         stop();
+
+        sleep(2000);
     }
 
-    private void stop() {
+    public void stop() {
         System.out.println("terminated.");
         bumperController.interrupt();
         drivingAI.interrupt();
+        continuousSensorCheck.interrupt();
         differentialPilot.stop();
+        drivingController.stop();
     }
 }

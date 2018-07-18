@@ -5,7 +5,8 @@ import lejos.nxt.TouchSensor;
 
 public class BumperController extends Thread {
 
-    private static final TouchSensor BUMPER = new TouchSensor(SensorPort.S3);
+    public static final SensorPort PORT = SensorPort.S3;
+    public static final TouchSensor BUMPER = new TouchSensor(PORT);
 
     private BumperCollisionListener listener;
 

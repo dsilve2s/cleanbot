@@ -22,15 +22,10 @@ public class DrivingController implements FeatureListener, BumperCollisionListen
     }
 
     private final DifferentialPilot differentialPilot;
-    private final DistanceMonitor distanceMonitor;
 
     public DrivingController(DifferentialPilot differentialPilot) {
         this.differentialPilot = differentialPilot;
-        distanceMonitor = new DistanceMonitor(differentialPilot);
-    }
-
-    public void start() {
-        distanceMonitor.start();
+        differentialPilot.setTravelSpeed(differentialPilot.getMaxTravelSpeed());
     }
 
     public void driveStraight(final DriveDirection driveDirection) {
@@ -42,6 +37,8 @@ public class DrivingController implements FeatureListener, BumperCollisionListen
 
     public void driveStraight(final DriveDirection driveDirection, float distance) {
 
+        differentialPilot.setTravelSpeed(differentialPilot.getMaxTravelSpeed());
+
         if (driveDirection != DriveDirection.FORWARD) distance *= -1;
         differentialPilot.travel(distance);
 
@@ -52,6 +49,8 @@ public class DrivingController implements FeatureListener, BumperCollisionListen
 
         requireNonNull(turnDirection);
         requireNonNull(driveDirection);
+
+        differentialPilot.setTravelSpeed(differentialPilot.getMaxTravelSpeed() * 0.8);
 
         float turnRate = 0;
         float correctedAngle = 0;
@@ -97,27 +96,23 @@ public class DrivingController implements FeatureListener, BumperCollisionListen
     }
 
     public void handleBumperCollision() {
-//        System.out.println("Kollision hinten!");
         driveStraight(DriveDirection.FORWARD, 5);
-        Sound.playTone(1200, 500);
     }
 
     public void featureDetected(Feature feature, FeatureDetector detector) {
         int range = (int)feature.getRangeReading().getRange();
-//        System.out.println("obstacle in " + range + "cm");
         float driveBackwardDistance = (UltrasonicController.MAX_DISTANCE - range) + 10;
+        Sound.playTone(1200, 500);
         driveStraight(DriveDirection.BACKWARD, driveBackwardDistance);
         driveCurve(
-                TurnDirection.RIGHT,
+                randomEnum(TurnDirection.values()),
                 DriveDirection.FORWARD,
-                30,
+                90,
                 10
         );
-        Sound.playTone(1200, 500);
     }
 
     public void stop() {
         differentialPilot.stop();
-        distanceMonitor.interrupt();
     }
 }
